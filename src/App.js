@@ -3,9 +3,19 @@ import './App.css';
 import {useState, useEffect} from 'react';
 import styled from 'styled-components';
 
+const fakeAsync = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const available = Math.random() > 0.5;
+      resolve(available);
+    }, 1000)
+  })
+}
+
 function App() {
   const [step, setStep] = useState(1);
   const [parts, setParts] = useState(Array(2));
+  const [partResults, setPartResults] = useState([]);
   const [currentPart, setCurrentPart] = useState('')
 
   const textChange = (e) => {
@@ -26,12 +36,22 @@ function App() {
     let currentStep = step;
     setStep(currentStep + 1);
     setCurrentPart('');
+    if (currentStep + 1 === 3) {
+      fakeAPI();
+    }
   };
 
   const goBack = () => {
     let currentStep = step;
     setCurrentPart(JSON.stringify(parts[currentStep - 2]));
     setStep(currentStep - 1);
+  }
+
+
+
+  const fakeAPI = async () => {
+    const results = await Promise.all([fakeAsync(), fakeAsync()]);
+    setPartResults(results);
   }
 
 
@@ -45,9 +65,31 @@ function App() {
       <StepTracker step={step} number={2}>2</StepTracker>
       <StepTracker step={step} number={3}>3</StepTracker>
       <h1>Upload Parts</h1>
-      <InputBox onChange={textChange} value={currentPart}></InputBox>
-      <button onClick={goBack}>Back</button>
-      <button onClick={addPart}>Next</button>
+      {
+        step < 3 &&
+        <InputBox onChange={textChange} value={currentPart}></InputBox>
+      }
+
+      {
+        step === 3 && (!partResults.length) ?
+        'Loading Results...'
+        :
+        partResults.map((val, index) => (
+          <div key={index}>
+            {`part ${index}: ${val ? 'Success':'Fail'}`}
+          </div>
+        ))
+      }
+
+
+      {
+        step !== 1 &&
+        <button onClick={goBack}>Back</button>
+      }
+      {
+        step !== 3 &&
+        <button onClick={addPart}>Next</button>
+      }
     </Container>
   );
 }
