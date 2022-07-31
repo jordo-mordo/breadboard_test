@@ -61,35 +61,47 @@ function App() {
   console.log(step, parts);
   return (
     <Container>
-      <StepTracker step={step} number={1}>1</StepTracker>
-      <StepTracker step={step} number={2}>2</StepTracker>
-      <StepTracker step={step} number={3}>3</StepTracker>
-      <h1>Upload Parts</h1>
+    <h1>Upload Parts</h1>
+      <StepContainer>
+        <StepTracker step={step} number={1}>1</StepTracker>
+        <StepTracker step={step} number={2}>2</StepTracker>
+        <StepTracker step={step} number={3}>3</StepTracker>
+      </StepContainer>
       {
         step < 3 &&
         <InputBox onChange={textChange} value={currentPart}></InputBox>
       }
 
       {
-        step === 3 && (!partResults.length) ?
-        'Loading Results...'
-        :
-        partResults.map((val, index) => (
-          <div key={index}>
-            {`part ${index}: ${val ? 'Success':'Fail'}`}
-          </div>
-        ))
+        step === 3 &&
+        (
+          (!partResults.length) ?
+          <ResultsContainer>Loading Results...</ResultsContainer>
+          :
+          <ResultsContainer>
+          {partResults.map((val, index) => (
+            <Result key={index} pass={val}>
+              {`part ${index}: ${val ? 'Success':'Fail'}`}
+            </Result>
+          ))}
+          </ResultsContainer>
+        )
       }
 
-
-      {
-        step !== 1 &&
-        <button onClick={goBack}>Back</button>
-      }
-      {
-        step !== 3 &&
-        <button onClick={addPart}>Next</button>
-      }
+      <ButtonContainer>
+        {
+          step !== 1 ?
+          <button onClick={goBack}>Back</button>
+          :
+          <div/>
+        }
+        {
+          step !== 3 ?
+          <button onClick={addPart}>Next</button>
+          :
+          <div/>
+        }
+      </ButtonContainer>
     </Container>
   );
 }
@@ -97,12 +109,65 @@ function App() {
 export default App;
 
 const Container = styled.div`
+  position: relative;
+  margin: auto;
+
+  border: 1px solid black;
+  width: 1000px;
+  height: 100vh;
+  padding: 50px;
+
+  h1 {
+    text-align: center;
+  }
 `;
 
 const InputBox = styled.textarea`
+  height:500px;
+  width:100%;
+  font-size: 200%;
+`;
 
+const StepContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin: 30px 0;
 `;
 
 const StepTracker = styled.div`
   background: ${({step, number}) => step > number ? 'green': 'white'};
+  border: 1px solid black;
+  width: 100px;
+  height:100px;
+  border-radius: 50%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+`;
+
+const ResultsContainer = styled.div`
+  height:500px;
+  width:100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap:10px;
+`;
+
+const Result = styled.div`
+  color: ${({pass}) => pass ? 'green' : 'red'};
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  *{
+    font-size: 200%;
+  }
+
 `;
